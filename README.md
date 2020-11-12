@@ -1,8 +1,8 @@
-<img src="images/topic.jpg" style="zoom: 33%;" />
+<img src="images/topic.jpg" />
 
-<h1><center>upyun-multistage-uploader</center></h1>
+# upyun-multistage-uploader
 
-<center><img src="https://img.shields.io/github/license/unresolved/upyun-multistage-uploader" /> <img src="https://img.shields.io/github/v/release/unresolved/upyun-multistage-uploader" /></center>
+![](https://img.shields.io/github/license/unresolved/upyun-multistage-uploader) ![](https://img.shields.io/github/v/release/unresolved/upyun-multistage-uploader)
 
 ## 介绍
 
