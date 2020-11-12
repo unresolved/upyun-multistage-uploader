@@ -184,6 +184,8 @@ public boolean await(long timeout, TimeUnit unit);
 
 该示例演示了完整的流程，提供了实时上传进度显示功能以及上传速度计算。
 
+>  示例文件所在位置：src/test/java/Main.java
+
 ```java
 import io.github.unresolved.upyun.MultistageUploader;
 import io.github.unresolved.upyun.OnProgressChangedListener;
