@@ -24,7 +24,6 @@ public class Main {
                 .setSliceSize(UploaderConfig.DEFAULT_SLICE_SIZE * 10) /* 可选 */
                 .setConcurrentSize(8); /* 可选 */
         // 初始化 uploader
-        // 分片大小 10MB 同时上传的任务数量 16 个
         MultistageUploader uploader = new MultistageUploader(config, srcFile, destPath);
         uploader.setOnProgressChangedListener(new OnProgressChangedListener() {
 
