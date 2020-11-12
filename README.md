@@ -1,8 +1,8 @@
-![](images/topic.jpg)
+![upyun-multistage-uploader](images/topic.jpg)
 
 # upyun-multistage-uploader
 
-![](https://img.shields.io/github/license/unresolved/upyun-multistage-uploader) ![](https://img.shields.io/github/v/release/unresolved/upyun-multistage-uploader)
+![MIT License](https://img.shields.io/github/license/unresolved/upyun-multistage-uploader) ![Release](https://img.shields.io/github/v/release/unresolved/upyun-multistage-uploader)
 
 ## 介绍
 
