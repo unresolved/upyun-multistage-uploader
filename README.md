@@ -1,6 +1,6 @@
 # upyun-multistage-uploader
 
-![](https://img.shields.io/github/license/unresolved/upyun-multistage-uploader)![](https://img.shields.io/github/v/release/unresolved/upyun-multistage-uploader)
+![](https://img.shields.io/github/license/unresolved/upyun-multistage-uploader) ![](https://img.shields.io/github/v/release/unresolved/upyun-multistage-uploader)
 
 ## 介绍
 
