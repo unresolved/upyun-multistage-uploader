@@ -1,4 +1,4 @@
-<img src="images/topic.jpg" />
+![](images/topic.jpg)
 
 # upyun-multistage-uploader
 
