@@ -2,6 +2,7 @@ package io.github.unresolved.upyun;
 
 import okhttp3.*;
 import okio.BufferedSink;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,14 +33,13 @@ class UploadSliceTask implements Runnable {
 
     public void run() {
         try {
-            // buffer size 4K
-            final int bufferSize = 4096;
+            UploaderConfig config = uploader.getConfig();
+            // allocate buffer
+            final int bufferSize = config.getReadBufferSize();
             // open target file
             final BufferedRandomAccessFile file = new BufferedRandomAccessFile(targetFile, "r", bufferSize);
             // seek to offset in file
             file.seek(targetSlice.getOffset());
-
-            UploaderConfig config = uploader.getConfig();
 
             String uploadDate = UpyunUtils.getGMTDate();
             String uriPath = "/" + config.getBucketName() + "/" + uploader.getDestPath();
@@ -62,7 +62,7 @@ class UploadSliceTask implements Runnable {
                     return remaining;
                 }
 
-                public void writeTo(BufferedSink bufferedSink) {
+                public void writeTo(@NotNull BufferedSink bufferedSink) {
                     try {
                         while (remaining != 0) {
                             // read from disk
@@ -77,7 +77,8 @@ class UploadSliceTask implements Runnable {
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        // mark this task failure
+                        // mark this task failure if transmission error happened
+                        remaining = targetSlice.getLength();
                         taskStatus = TaskStatus.FAILURE;
                     } finally {
                         try {
@@ -106,12 +107,15 @@ class UploadSliceTask implements Runnable {
             Response response = mClient.newCall(builder.build()).execute();
             ResponseBody responseBody = response.body();
             if (response.code() != 204) {
+                taskStatus = TaskStatus.FAILURE;
                 throw new UploaderException("excepted response code: " + response.code() + ", server responded: "
                         + (responseBody == null ? null : responseBody.string()));
             }
             // mark this task is finished
             taskStatus = TaskStatus.FINISHED;
         } catch (UploaderException | IOException e) {
+            // mark this task failure if OkHttpClient request error happened
+            taskStatus = TaskStatus.FAILURE;
             e.printStackTrace();
         }
     }
@@ -134,6 +138,10 @@ class UploadSliceTask implements Runnable {
 
     public String getUpyunMultiUuid() {
         return upyunMultiUuid;
+    }
+
+    public void setStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
     }
 
     public TaskStatus getStatus() {

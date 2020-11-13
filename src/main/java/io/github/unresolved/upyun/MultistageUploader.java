@@ -116,10 +116,11 @@ public class MultistageUploader {
                         UploadSliceTask targetTask = taskQueue.get(i);
                         if (targetTask.getStatus() == TaskStatus.FINISHED)
                             finishedCount++;
-                        // add failed tasks to the end of the task list
-                        if (targetTask.getStatus() == TaskStatus.FAILURE) {
+                        else if (targetTask.getStatus() == TaskStatus.FAILURE) {
+                            // add failed tasks to the end of the task list
                             taskQueue.remove(i);
                             targetTask.getTargetSlice().setPosition(0);
+                            targetTask.setStatus(TaskStatus.CREATED);
                             threadPool.submit(targetTask);
                             taskQueue.add(targetTask);
                             break;
@@ -202,9 +203,12 @@ public class MultistageUploader {
     /**
      * Blocks until all tasks have completed, or the timeout occurs。
      *
-     * @return true if all tasks have completed and false if the timeout elapsed before termination
+     * @return {@code true} if all tasks have completed and {@code false} if the timeout elapsed before termination
      */
     public boolean await(long timeout, TimeUnit unit) {
+        // thread pool not initialized yet
+        if (threadPool == null)
+            return true;
         try {
             return threadPool.awaitTermination(timeout, unit);
         } catch (InterruptedException e) {
@@ -231,9 +235,11 @@ public class MultistageUploader {
             long finished = 0;
             long total = 0;
             for (UploadSliceTask task : taskQueue) {
-                if (task.getStatus() != TaskStatus.FAILURE) {
+                total += task.getTargetSlice().getLength();
+                if (task.getStatus() == TaskStatus.FINISHED)
+                    finished += task.getTargetSlice().getLength();
+                else if (task.getStatus() != TaskStatus.FAILURE) {
                     finished += task.getTargetSlice().getPosition();
-                    total += task.getTargetSlice().getLength();
                 }
             }
             listener.onProgressChanged(finished, total);
