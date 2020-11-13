@@ -63,9 +63,8 @@ public class MultistageUploader {
             String initiateDate = UpyunUtils.getGMTDate();
             String initiateSign = UpyunUtils.sign("PUT", initiateDate, uriPath, config.getOperator(),
                     UpyunUtils.md5(config.getPassword()), null);
-            if (initiateSign == null) {
+            if (initiateSign == null)
                 throw new UploaderException("failed to calculate multistage upload initiate signature.");
-            }
 
             Request request = new Request.Builder()
                     .url(config.getEndpoint() + uriPath)
@@ -87,6 +86,7 @@ public class MultistageUploader {
             String upyunMultiUuid = response.header("X-Upyun-Multi-Uuid");
             if (upyunMultiUuid == null)
                 throw new UploaderException("server responded 204 but can not find X-Upyun-Multi-Uuid in response headers.");
+
             response.close();
 
             threadPool = Executors.newFixedThreadPool(config.getConcurrentSize());
@@ -116,7 +116,7 @@ public class MultistageUploader {
                         UploadSliceTask targetTask = taskQueue.get(i);
                         if (targetTask.getStatus() == TaskStatus.FINISHED)
                             finishedCount++;
-                        // 失败的任务重新添加到任务列表最后面
+                        // add failed tasks to the end of the task list
                         if (targetTask.getStatus() == TaskStatus.FAILURE) {
                             taskQueue.remove(i);
                             targetTask.getTargetSlice().setPosition(0);

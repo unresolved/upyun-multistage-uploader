@@ -8,18 +8,17 @@ import java.io.IOException;
 
 class UploadSliceTask implements Runnable {
 
-    private MultistageUploader uploader;
+    private final MultistageUploader uploader;
     private static int nextTaskId = 1;
-    private int taskId;
-    private long createTime;
-    private File targetFile;
-    private Slice targetSlice;
-    // X-Upyun-Multi-Uuid 任务标识，初始化时生成
-    private String upyunMultiUuid;
+    private final int taskId;
+    private final long createTime;
+    private final File targetFile;
+    private final Slice targetSlice;
+    // X-Upyun-Multi-Uuid generated when 'initiate' stage
+    private final String upyunMultiUuid;
     // current task status
     private TaskStatus taskStatus = TaskStatus.CREATED;
-    private OkHttpClient mClient;
-    private int failedCount = 0;
+    private final OkHttpClient mClient;
 
     public UploadSliceTask(MultistageUploader uploader, File targetFile, Slice targetSlice, String upyunMultiUuid) {
         this.uploader = uploader;
@@ -46,6 +45,8 @@ class UploadSliceTask implements Runnable {
             String uriPath = "/" + config.getBucketName() + "/" + uploader.getDestPath();
             String uploadSign = UpyunUtils.sign("PUT", uploadDate, uriPath, config.getOperator(),
                     UpyunUtils.md5(config.getPassword()), null);
+            if (uploadSign == null)
+                throw new UploaderException("failed to calculate multistage upload signature.");
 
             RequestBody requestBody = new RequestBody() {
 
@@ -67,10 +68,11 @@ class UploadSliceTask implements Runnable {
                             // read from disk
                             byte[] buffer = new byte[bufferSize];
                             int readCount = file.read(buffer, 0, buffer.length);
-                            // send to remote server
+                            // write to bufferedSink
                             bufferedSink.write(buffer, 0, readCount);
                             remaining -= readCount;
                             targetSlice.setPosition(targetSlice.getPosition() + readCount);
+                            // update global upload progress
                             uploader.notifyProgressChanged();
                         }
                     } catch (IOException e) {
@@ -109,9 +111,7 @@ class UploadSliceTask implements Runnable {
             }
             // mark this task is finished
             taskStatus = TaskStatus.FINISHED;
-        } catch (UploaderException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (UploaderException | IOException e) {
             e.printStackTrace();
         }
     }

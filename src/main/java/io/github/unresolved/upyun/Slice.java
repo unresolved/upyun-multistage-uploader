@@ -1,29 +1,20 @@
 package io.github.unresolved.upyun;
 
 /**
- * 保存文件切片信息
+ * Save the file slice information
  */
 class Slice {
 
-    /**
-     * X-Upyun-Part-Id 分块序号，序号从 0 开始
-     */
+    // X-Upyun-Part-Id starting at 0
     private int partId;
 
-    /**
-     * 起始位置
-     */
+    // start position in file
     private long offset;
 
-    /**
-     * 切片长度
-     */
+    // slice size
     private long length;
 
-    /**
-     * current marked position
-     * {@link #offset} is position 0
-     */
+    // current marked position, offset is position 0
     private long position = 0;
 
     public Slice(int partId, long offset, long length) {
@@ -64,14 +55,4 @@ class Slice {
         this.position = position;
     }
 
-    @Override
-    public String toString() {
-        return "io.github.unresolved.upyun.Slice{" +
-                "partId=" + partId +
-                ", offset=" + offset +
-                ", length=" + length +
-                ", position=" + position +
-                '}';
-    }
-    
 }
